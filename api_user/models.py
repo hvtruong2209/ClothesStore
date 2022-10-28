@@ -22,19 +22,37 @@ class UserManage(BaseUserManager):
         user.save(using=self._db)
         return user
 
+class Place(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    no = models.CharField(max_length=50)
+    street = models.CharField(max_length=100)
+    district = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'Place'
+
+class Role(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'Role'
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,null=True,blank=True,default="")
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
     gender = models.IntegerField(null=True, blank=True)
     birthday = models.DateField(null=True, blank=True)
     phone = models.TextField(max_length=11,null=True)
-    # password
     # image =
-    # place =
+    place = models.OneToOneField(Place, on_delete=models.CASCADE, null=True, related_name='user_place')
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True, related_name='user_role')
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
